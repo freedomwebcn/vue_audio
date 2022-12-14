@@ -98,7 +98,7 @@ function prevPlay() {
   }
   index--;
   loadTrack(index);
-  playStatus && audio.play();
+  audio.play();
 }
 const prevPlayThrottled = throttle(prevPlay, 500, {
   trailing: false
@@ -114,8 +114,9 @@ function nextPlay() {
     index = 0;
   }
   loadTrack(index);
-  playStatus && audio.play();
+  audio.play();
 }
+
 const nextPlayThrottled = throttle(nextPlay, 500, {
   trailing: false
 });
@@ -140,13 +141,13 @@ function pause() {
 function playing() {
   playStatus = true;
   getcurrentTime();
-  console.log('缺少数据而暂停或延迟的状态已结束，正准备播放...');
+  console.log('因缺少数据而暂停或延迟的状态已结束，正准备播放...');
 }
 
 function waiting() {
   playStatus = false;
   clearTimeout(timerId);
-  console.log('因为暂时性缺少数据，播放暂停。');
+  console.log('因暂时性缺少数据，播放暂停。');
 }
 
 function ended() {

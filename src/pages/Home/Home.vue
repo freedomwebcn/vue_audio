@@ -94,6 +94,7 @@ function playAudio() {
 }
 
 function prevPlay() {
+  currentTime = '0:00';
   if (index <= 0) {
     index = trackCount;
   }
@@ -106,6 +107,7 @@ const prevPlayThrottled = throttle(prevPlay, 500, {
 });
 
 function nextPlay() {
+  currentTime = '0:00';
   console.log('next...');
   if (index + 1 < trackCount) {
     console.log(index);

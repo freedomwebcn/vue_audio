@@ -6,8 +6,8 @@
     <div class="wave"></div>
     <div class="container">
       <div class="s-name-box" ref="sNameBoxRef">
-        <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }" ref="lBgRef"></i>
-        <div class="s-name" :class="{ add_animation: animationStatus }" ref="sNameRef">
+        <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }"></i>
+        <div class="s-name" :class="{ add_animation: animationStatus }">
           <span class="name text" ref="textRef">{{ nameText }}</span>
           <span class="name" ref="text2Ref"></span>
         </div>
@@ -40,10 +40,8 @@ const currentTime = $ref('0:00');
 const playing = $ref(false);
 const nameText = $ref('');
 const sNameBoxRef = $ref();
-const sNameRef = $ref();
 const textRef = $ref();
 const text2Ref = $ref();
-const lBgRef = $ref();
 const rBgRef = $ref();
 const animationStatus = $ref(false);
 let index = 0;
@@ -123,7 +121,6 @@ const nextPlayThrottled = throttle(nextPlay, 500, {
 });
 
 function getcurrentTime() {
-  timerId && clearTimeout(timerId);
   timerId = setTimeout(() => {
     currentTime = formatTime(Math.round(audio.currentTime));
     getcurrentTime();
@@ -147,7 +144,9 @@ function pause() {
 }
 
 function ended() {
-  playing = false;
+  setTimeout(() => {
+    nextPlay();
+  }, 500);
   console.log('play end');
 }
 

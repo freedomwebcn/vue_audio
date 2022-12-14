@@ -1,5 +1,5 @@
 <template>
-  <div class="playerUi" :class="{ playing: playing }">
+  <div class="playerUi" :class="{ playing: playStatus }">
     <div class="image"></div>
     <div class="wave"></div>
     <div class="wave"></div>
@@ -21,11 +21,11 @@
         </div>
         <div class="controls__footer">
           <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
-          <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playing, 'zmdi-pause-circle': playing }"></span>
+          <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
           <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
         </div>
       </div>
-      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @play="play" @pause="pause" @ended="ended"></audio>
+      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
     </div>
   </div>
 </template>
@@ -37,7 +37,7 @@ import { throttle } from 'lodash';
 const audio = $ref();
 const duration = $ref('0:00');
 const currentTime = $ref('0:00');
-const playing = $ref(false);
+const playStatus = $ref(false);
 const nameText = $ref('');
 const sNameBoxRef = $ref();
 const textRef = $ref();
@@ -83,9 +83,9 @@ async function loadTrack(id) {
 }
 
 function playAudio() {
-  if (playing) {
+  if (playStatus) {
     audio.pause();
-    playing = false;
+    playStatus = false;
     return;
   }
   audio.play();
@@ -98,7 +98,7 @@ function prevPlay() {
   }
   index--;
   loadTrack(index);
-  playing && audio.play();
+  playStatus && audio.play();
 }
 const prevPlayThrottled = throttle(prevPlay, 500, {
   trailing: false
@@ -114,7 +114,7 @@ function nextPlay() {
     index = 0;
   }
   loadTrack(index);
-  playing && audio.play();
+  playStatus && audio.play();
 }
 const nextPlayThrottled = throttle(nextPlay, 500, {
   trailing: false
@@ -131,22 +131,28 @@ function loadedMetaData() {
   duration = formatTime(Math.round(audio.duration));
 }
 
-function play() {
-  console.log('play...');
-  playing = true;
-  getcurrentTime();
-}
-
 function pause() {
   console.log('pause...');
   currentTime = formatTime(Math.round(audio.currentTime));
   clearTimeout(timerId);
 }
 
+function playing() {
+  playStatus = true;
+  getcurrentTime();
+  console.log('缺少数据而暂停或延迟的状态已结束，正准备播放...');
+}
+
+function waiting() {
+  playStatus = false;
+  clearTimeout(timerId);
+  console.log('因为暂时性缺少数据，播放暂停。');
+}
+
 function ended() {
   setTimeout(() => {
     nextPlay();
-  }, 600);
+  }, 1000);
   console.log('play end');
 }
 

@@ -146,7 +146,7 @@ function pause() {
 function ended() {
   setTimeout(() => {
     nextPlay();
-  }, 500);
+  }, 600);
   console.log('play end');
 }
 

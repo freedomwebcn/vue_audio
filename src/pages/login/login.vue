@@ -18,7 +18,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reqAnonimousLogin } from '@/api';
+// import { reqAnonimousLogin } from '@/api';
 import localStorage from '@/tools/localStorage.js';
 
 const { setItem, getItem } = localStorage();

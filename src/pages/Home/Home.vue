@@ -1,32 +1,34 @@
 <template>
   <div class="playerUi" :class="{ playing: playStatus }">
-    <div class="image"></div>
-    <div class="wave"></div>
-    <div class="wave"></div>
-    <div class="wave"></div>
-    <div class="container">
-      <div class="s-name-box" ref="sNameBoxRef">
-        <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }"></i>
-        <div class="s-name" :class="{ add_animation: animationStatus }">
-          <span class="name text" ref="textRef">{{ nameText }}</span>
-          <span class="name" ref="text2Ref"></span>
+    <template v-if="trackCount">
+      <div class="image"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="container">
+        <div class="s-name-box" ref="sNameBoxRef">
+          <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }"></i>
+          <div class="s-name" :class="{ add_animation: animationStatus }">
+            <span class="name text" ref="textRef">{{ nameText }}</span>
+            <span class="name" ref="text2Ref"></span>
+          </div>
+          <i class="r-bg" ref="rBgRef"></i>
         </div>
-        <i class="r-bg" ref="rBgRef"></i>
-      </div>
 
-      <div class="player__controls">
-        <div class="player__times">
-          <div class="player__time player__time--current">{{ currentTime }}</div>
-          <div class="player__time player__time--duration">{{ duration }}</div>
+        <div class="player__controls">
+          <div class="player__times">
+            <div class="player__time player__time--current">{{ currentTime }}</div>
+            <div class="player__time player__time--duration">{{ duration }}</div>
+          </div>
+          <div class="controls__footer">
+            <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
+            <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
+            <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
+          </div>
         </div>
-        <div class="controls__footer">
-          <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
-          <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
-          <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
-        </div>
+        <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
       </div>
-      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -46,7 +48,7 @@ const rBgRef = $ref();
 const animationStatus = $ref(false);
 let index = 0;
 let timerId = null;
-const tracks = [
+const tracks = $ref([
   {
     id: 1,
     src: 'https://soundbible.com/mp3/airplane-takeoff_daniel_simion.mp3',
@@ -65,11 +67,11 @@ const tracks = [
     type: 'audio/mp3',
     name: 'Meadowlark - Daniel Simion'
   }
-];
+]);
 const trackCount = tracks.length;
 
 onMounted(() => {
-  loadTrack(index);
+  trackCount && loadTrack(index);
 });
 
 function formatTime(s) {
@@ -93,10 +95,7 @@ function playAudio() {
 
 function prevPlay() {
   currentTime = '0:00';
-  if (index <= 0) {
-    index = trackCount;
-  }
-  index--;
+  index <= 0 ? (index = trackCount) : index--;
   loadTrack(index);
   audio.play();
 }
@@ -107,12 +106,7 @@ const prevPlayThrottled = throttle(prevPlay, 500, {
 function nextPlay() {
   currentTime = '0:00';
   console.log('next...');
-  if (index + 1 < trackCount) {
-    console.log(index);
-    index++;
-  } else {
-    index = 0;
-  }
+  index + 1 < trackCount ? index++ : (index = 0);
   loadTrack(index);
   audio.play();
 }
@@ -121,10 +115,10 @@ const nextPlayThrottled = throttle(nextPlay, 500, {
   trailing: false
 });
 
-function getcurrentTime() {
+function getcurrentTime(flag = true) {
   timerId = setTimeout(() => {
     currentTime = formatTime(Math.round(audio.currentTime));
-    getcurrentTime();
+    flag && getcurrentTime();
   }, 1000);
 }
 
@@ -134,7 +128,7 @@ function loadedMetaData() {
 
 function pause() {
   console.log('pause...');
-  currentTime = formatTime(Math.round(audio.currentTime));
+  getcurrentTime(false);
   clearTimeout(timerId);
 }
 

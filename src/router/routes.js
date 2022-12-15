@@ -1,4 +1,5 @@
 import Home from '@/pages/Home/Home.vue';
+import Login from '@/pages/Login/Login.vue';
 
 const routes = [
   {
@@ -11,6 +12,12 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Home
+  },
+
+  {
+    path: '/Login',
+    name: 'Login',
+    component: Login
   }
 ];
 

@@ -37,6 +37,7 @@ async function anonimousLogin() {
   }
 }
 
+//Cehis
 function loginSuccess(data) {
   setItem('token', data);
   loginStatus = true;

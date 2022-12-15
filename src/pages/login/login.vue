@@ -21,9 +21,9 @@ import { useRouter } from 'vue-router';
 // import { reqAnonimousLogin } from '@/api';
 import localStorage from '@/tools/localStorage.js';
 
-const { setItem, getItem } = localStorage();
+const { setItem } = localStorage();
 const router = useRouter();
-const tips = $ref('');
+// const tips = $ref('');
 async function anonimousLogin() {
   try {
     // const data = await reqAnonimousLogin();

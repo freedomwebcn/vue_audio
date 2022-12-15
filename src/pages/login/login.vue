@@ -9,7 +9,7 @@
     <div class="login-mode">
       <h2 class="">Hello</h2>
       <div class="login">
-        <input type="text" class="phone comm" placeholder="请输入手机号" />
+        <input type="text" class="phone comm" placeholder="请输入手机号码" />
         <input type="passworld" class="passworld comm" placeholder="请输入密码" />
 
         <button class="btn phone-login">登录</button>

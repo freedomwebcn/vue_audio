@@ -174,7 +174,7 @@ function isAddAnimation(id) {
   height: 566px;
   background-color: white;
   overflow: hidden;
-  margin: 58px auto;
+  /* margin: 24px auto; */
   border-radius: 5px;
   user-select: none;
   box-shadow: 0px 8px 28px -9px rgb(0 0 0 / 45%);

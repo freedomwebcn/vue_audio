@@ -56,7 +56,7 @@ async function anonimousLogin() {
   position: relative;
   width: 100%;
   height: 100%;
-  background: url(./img/01.png) top center;
+  /* background: url(/01) top center; */
   background-size: cover;
   opacity: 0.5;
 }

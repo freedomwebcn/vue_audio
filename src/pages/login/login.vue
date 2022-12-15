@@ -1,7 +1,10 @@
 <template>
   <div class="login-page">
     <div class="bg_img"></div>
-    <span class="tip">66</span>
+
+    <Transition>
+      <span class="tip" v-if="loginStatus">欢迎回来</span>
+    </Transition>
 
     <div class="login-mode">
       <h2 class="">Hello</h2>
@@ -23,19 +26,23 @@ import localStorage from '@/tools/localStorage.js';
 
 const { setItem } = localStorage();
 const router = useRouter();
-// const tips = $ref('');
+const loginStatus = $ref(false);
 async function anonimousLogin() {
   try {
     // const data = await reqAnonimousLogin();
     const data = 'fglkdfgkfkgfggh';
-    setItem('token', data);
-    tips = '登录成功，正在跳转！';
-    setTimeout(() => {
-      router.replace({ path: '/home' });
-    }, 1000);
+    loginSuccess(data);
   } catch (err) {
-    console.log(err);
+    alert('登录失败', err);
   }
+}
+
+function loginSuccess(data) {
+  setItem('token', data);
+  loginStatus = true;
+  setTimeout(() => {
+    router.replace({ path: '/home' });
+  }, 2000);
 }
 </script>
 
@@ -45,11 +52,33 @@ async function anonimousLogin() {
   height: 566px;
   margin: 58px auto;
   position: relative;
+  overflow: hidden;
 }
 
 .tip {
   position: absolute;
-  /* top: 0; */
+  z-index: 999;
+  top: 0;
+  width: 100%;
+  padding: 6px 0;
+  text-align: center;
+  background: #6ce036c4;
+  font-size: 13px;
+  color: white;
+  font-family: 'Noto Serif SC', serif !important;
+  /* will-change: transfrom; */
+}
+
+.v-enter-active,
+.v-leave-active {
+  transform: translateY(0);
+  transition: all 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 
 .bg_img {
@@ -118,6 +147,12 @@ async function anonimousLogin() {
   font-size: 15px;
   font-weight: 500;
   font-family: 'Noto Serif SC', serif !important;
+  transition: 0.5s;
+  user-select: none;
+}
+.login .btn:active {
+  opacity: 0.75;
+  transform: scale(0.75);
 }
 
 .login .phone-login {

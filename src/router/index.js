@@ -6,19 +6,19 @@ const router = createRouter({
   routes
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const token = window.localStorage.getItem('token');
-//   if (token) {
-//     if (to.name == 'Login') {
-//       next({ name: 'Home' });
-//     } else {
-//       next();
-//     }
-//   } else if (to.name !== 'Login') {
-//     next({ name: 'Login' });
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach(async (to, from, next) => {
+  const token = window.localStorage.getItem('token');
+  if (token) {
+    if (to.name == 'Login') {
+      next({ name: 'Home' });
+    } else {
+      next();
+    }
+  } else if (to.name !== 'Login') {
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
+});
 
 export default router;

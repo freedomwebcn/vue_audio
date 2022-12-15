@@ -37,7 +37,6 @@ async function anonimousLogin() {
   }
 }
 
-//Cehis
 function loginSuccess(data) {
   setItem('token', data);
   loginStatus = true;
@@ -94,7 +93,7 @@ function loginSuccess(data) {
 .login-mode {
   display: flex;
   flex-wrap: wrap;
-  padding: 50% 50px 0px 50px;
+  padding: 50% 41px 0px 41px;
   position: absolute;
   top: 0;
   width: 100%;

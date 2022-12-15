@@ -7,7 +7,7 @@
       <h2 class="">Hello</h2>
       <div class="login">
         <input type="text" class="phone comm" placeholder="请输入手机号" />
-        <input type="text" class="passworld comm" placeholder="请输入密码" />
+        <input type="passworld" class="passworld comm" placeholder="请输入密码" />
 
         <button class="btn phone-login">登录</button>
         <button class="btn anonimous_login" @click="anonimousLogin">游客登录</button>
@@ -56,7 +56,7 @@ async function anonimousLogin() {
   position: relative;
   width: 100%;
   height: 100%;
-  /* background: url(/01) top center; */
+  background: url(./img/01.png) top center;
   background-size: cover;
   opacity: 0.5;
 }
@@ -83,6 +83,7 @@ async function anonimousLogin() {
   grid-template-columns: 100%;
   width: 100%;
   row-gap: 25px;
+  border-color: white;
 }
 
 .login .comm {
@@ -91,9 +92,14 @@ async function anonimousLogin() {
   color: white;
   font-size: 16px;
   padding: 5px;
-  border-bottom: 1px solid #b0b3b9;
+  border-bottom: 1px solid #c4c6cc;
   background: none;
   font-family: 'Noto Serif SC', serif !important;
+}
+
+.login .comm::placeholder {
+  color: #c0c3c9;
+  font-size: 15px;
 }
 .login .phone {
   margin: 10px 0 0 0;

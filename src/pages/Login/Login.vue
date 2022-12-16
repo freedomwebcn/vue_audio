@@ -24,7 +24,7 @@ import localStorage from '@/tools/localStorage.js';
 const { setItem, getItem } = localStorage();
 const router = useRouter();
 const loginStatus = $ref(false);
-const imgList = ['01.png', '02.jpg', '03.jpg', '05.jpg', '06.jpg'];
+const imgList = ['/1zg3XygK/01.png', '/137zy8zt/02.jpg', '/5tZNFDLW/03.jpg', '/QCD8f5f6/05.jpg', '/0QD5GZ0M/06.jpg'];
 let currentBgUrl = '';
 const styleObject = $ref({});
 let currentBgIndex = parseInt(getItem('index'));
@@ -43,7 +43,7 @@ if (currentBgIndex >= 0) {
 
 function setStyleObject() {
   styleObject = {
-    background: `url(/src/assets/img/${currentBgUrl}) top center`,
+    background: `url(https://i.postimg.cc/${currentBgUrl}) top center`,
     backgroundSize: `cover`
   };
 }

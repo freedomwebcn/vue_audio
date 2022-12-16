@@ -1,5 +1,6 @@
 <template>
   <div class="playerUi" :class="{ playing: playStatus }">
+    <i class="zmdi zmdi-arrow-left arrow-left"></i>
     <template v-if="trackCount">
       <div class="image"></div>
       <div class="wave"></div>
@@ -35,7 +36,7 @@
 <script setup>
 import { nextTick, onMounted } from 'vue';
 import { throttle } from 'lodash';
-import { reqUserInfo } from '@/api';
+// import { reqUserInfo } from '@/api';
 
 async function getUserInfo() {
   const userInfo = await reqUserInfo();
@@ -176,7 +177,7 @@ function isAddAnimation(id) {
 .playerUi {
   position: relative;
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   width: 300px;
   height: 566px;
   background-color: white;
@@ -185,6 +186,17 @@ function isAddAnimation(id) {
   border-radius: 5px;
   user-select: none;
   box-shadow: 0px 8px 28px -9px rgb(0 0 0 / 45%);
+}
+
+.playerUi .arrow-left {
+  width: 22px;
+  height: 22px;
+  color: rgb(197, 195, 195);
+  z-index: 99999;
+  margin: 10px;
+  line-height: 22px;
+  font-style: normal;
+  font-size: 22px;
 }
 
 .playerUi .wave {

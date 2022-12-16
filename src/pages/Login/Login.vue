@@ -7,9 +7,9 @@
     <div class="login-mode">
       <h2 class="">Hello</h2>
       <div class="login">
-        <input type="text" class="phone comm" placeholder="请输入手机号码" />
+        <input type="text" class="phone comm" placeholder="请输入手机号码" v-model="phone" />
         <input type="passworld" class="passworld comm" placeholder="请输入密码" />
-        <button class="btn phone-login">登录</button>
+        <button class="btn phone-login" @click="phoneLogin">登录</button>
         <button class="btn anonimous_login" @click="anonimousLogin">游客登录</button>
       </div>
     </div>
@@ -28,6 +28,7 @@ const imgList = ['/1zg3XygK/01.png', '/137zy8zt/02.jpg', '/5tZNFDLW/03.jpg', '/Q
 let currentBgUrl = '';
 const styleObject = $ref({});
 let currentBgIndex = parseInt(getItem('index'));
+const phone = $ref();
 
 if (currentBgIndex >= 0) {
   currentBgIndex = currentBgIndex >= imgList.length - 1 ? 0 : ++currentBgIndex;
@@ -52,9 +53,8 @@ async function anonimousLogin() {
   try {
     const data = await reqAnonimousLogin();
 
-    console.log(data);
     // const data = 'fglkdfgkfkgfggh';
-    loginSuccess(anonimous, data);
+    loginSuccess(data);
   } catch (err) {
     alert('登录失败', err);
   }
@@ -63,21 +63,18 @@ async function anonimousLogin() {
 // 直接输入密码登录不成功 用浏览器登陆可以 这里直接传入浏览器登陆后的cookie
 async function phoneLogin() {
   try {
-    const data = await reqAnonimousLogin();
-
-    console.log(data);
-    // const data = 'fglkdfgkfkgfggh';
-    loginSuccess(phone, data);
+    loginSuccess({ cookie: phone });
   } catch (err) {
     alert('登录失败', err);
   }
 }
-function loginSuccess(loginMode, data) {
-  setItem(`${loginMode}_login_data`, data, true);
+
+function loginSuccess(data) {
+  setItem(`login_data`, data, true);
   loginStatus = true;
-  //   setTimeout(() => {
-  //     router.replace({ path: '/home' });
-  //   }, 2000);
+  setTimeout(() => {
+    router.replace({ path: '/home' });
+  }, 2000);
 }
 </script>
 

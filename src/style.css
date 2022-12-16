@@ -12,4 +12,12 @@ body {
   height: 100%;
   overflow: hidden;
   background-color: #fff;
+
+  font-family:
+    'Noto Sans SC',
+    sans-serif;
+}
+
+li {
+  list-style: none;
 }

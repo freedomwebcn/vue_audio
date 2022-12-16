@@ -35,7 +35,14 @@
 <script setup>
 import { nextTick, onMounted } from 'vue';
 import { throttle } from 'lodash';
+import { reqUserInfo } from '@/api';
 
+async function getUserInfo() {
+  const userInfo = await reqUserInfo();
+  console.log(userInfo);
+}
+
+// getUserInfo();
 const audio = $ref();
 const duration = $ref('0:00');
 const currentTime = $ref('0:00');

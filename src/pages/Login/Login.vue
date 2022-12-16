@@ -18,7 +18,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-// import { reqAnonimousLogin } from '@/api';
+import { reqAnonimousLogin } from '@/api';
 import localStorage from '@/tools/localStorage.js';
 
 const { setItem, getItem } = localStorage();
@@ -50,20 +50,34 @@ function setStyleObject() {
 
 async function anonimousLogin() {
   try {
-    // const data = await reqAnonimousLogin();
-    const data = 'fglkdfgkfkgfggh';
-    loginSuccess(data);
+    const data = await reqAnonimousLogin();
+
+    console.log(data);
+    // const data = 'fglkdfgkfkgfggh';
+    loginSuccess(anonimous, data);
   } catch (err) {
     alert('登录失败', err);
   }
 }
 
-function loginSuccess(data) {
-  setItem('token', data);
+// 直接输入密码登录不成功 用浏览器登陆可以 这里直接传入浏览器登陆后的cookie
+async function phoneLogin() {
+  try {
+    const data = await reqAnonimousLogin();
+
+    console.log(data);
+    // const data = 'fglkdfgkfkgfggh';
+    loginSuccess(phone, data);
+  } catch (err) {
+    alert('登录失败', err);
+  }
+}
+function loginSuccess(loginMode, data) {
+  setItem(`${loginMode}_login_data`, data, true);
   loginStatus = true;
-  setTimeout(() => {
-    router.replace({ path: '/home' });
-  }, 2000);
+  //   setTimeout(() => {
+  //     router.replace({ path: '/home' });
+  //   }, 2000);
 }
 </script>
 
@@ -74,7 +88,6 @@ function loginSuccess(data) {
   height: 566px;
   position: relative;
   overflow: hidden;
-  user-select: none;
   border-radius: 5px;
   box-shadow: 0px 8px 28px -9px rgb(0 0 0 / 45%);
 }
@@ -138,8 +151,7 @@ function loginSuccess(data) {
   grid-template-columns: 100%;
   width: 100%;
   row-gap: 25px;
-  padding-top: 56px;
-
+  padding-top: 68px;
   border-color: white;
 }
 

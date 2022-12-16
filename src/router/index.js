@@ -5,10 +5,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
-
 router.beforeEach(async (to, from, next) => {
-  const token = window.localStorage.getItem('token');
-  if (token) {
+  const { cookie } = JSON.parse(window.localStorage.getItem('login_data') || '{}');
+
+  if (cookie) {
     if (to.name == 'Login') {
       next({ name: 'Home' });
     } else {

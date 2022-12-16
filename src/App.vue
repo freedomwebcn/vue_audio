@@ -13,6 +13,7 @@
   display: grid;
   justify-content: center;
   row-gap: 16px;
+  user-select: none;
 }
 
 h1 {

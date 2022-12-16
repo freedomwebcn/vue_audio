@@ -15,7 +15,7 @@ export const reqUserAccountInfo = () => ajax(`/user/account?cookie=${cookie}`);
 export const reqRecommendMusic = () => ajax(`/recommend/songs?cookie=${cookie}`);
 
 //获取用户歌单  参数 uid ：用户id
-export const reqUserPlaylist = ({ uid }) => ajax(`/user/playlist?uid=${uid}&cookie=${cookie}`);
+export const reqUserPlaylist = ({ uid }) => ajax({ url: `/user/playlist?uid=${uid}&cookie=${cookie}`, withCredentials: true });
 
 // 检查音乐是否可用
 export const reqCheckMusic = () => ajax(`/song/url?id=1989132518&cookie=${cookie}`);

@@ -3,6 +3,7 @@
     <div class="card-profile">
       <div class="card-profile_visual">
         <div class="bg" :style="bgStyleObj"></div>
+        <div class="bg2"></div>
       </div>
       <img :src="profile.avatarUrl" alt="" class="avt_img" />
     </div>
@@ -13,7 +14,7 @@
       </div>
       <div class="playlist-content">
         <ul>
-          <li v-for="item in createPlaylistData" :key="item.id" :data-id="item.id">
+          <li v-for="item in createPlaylistData" :key="item.id" :data-id="item.id" @click="$router.push(`/PlaylistTrack/${item.id}`)">
             <img :src="item.coverImgUrl" alt="" />
             <div>
               <h3>{{ item.name }}</h3>
@@ -74,6 +75,7 @@ function formatData(data) {
   overflow-y: scroll;
   border-radius: 5px;
   box-shadow: 0px 8px 28px -9px rgb(0 0 0 / 45%);
+  background-color: #030303;
 }
 
 .card-profile {
@@ -82,9 +84,17 @@ function formatData(data) {
   justify-content: center;
   position: relative;
   background: #fff;
-  border-radius: 10px;
   z-index: 1;
   box-shadow: 0 0 5px rgb(0 0 0 / 10%);
+}
+.card-profile::after {
+  content: '';
+  position: absolute;
+  color: #fff;
+  bottom: -1px;
+  width: 100%;
+  height: 25px;
+  background: linear-gradient(rgba(9, 2, 4, 0), black);
 }
 
 .card-profile_visual {
@@ -101,14 +111,25 @@ function formatData(data) {
   position: absolute;
   z-index: 0;
   background: url(./01.png);
+  opacity: 0.8;
+}
+.card-profile_visual .bg2 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .avt_img {
   width: 64px;
   height: 64px;
   position: absolute;
-  bottom: -32px;
+  bottom: -25px;
   border-radius: 50%;
+  background: rgb(202, 193, 193);
+  z-index: 888;
+  border: 1px solid rgba(168, 166, 166, 0.281);
 }
 
 .playlist {
@@ -118,20 +139,26 @@ function formatData(data) {
 .playlist-header {
   display: flex;
   justify-content: space-between;
-  padding: 0 15px;
   font-size: 14px;
+  padding: 0 5px;
+}
+
+.playlist-header span {
+  padding: 5px 0;
 }
 
 .playlist-header .create-playlist {
-  color: rgb(253, 57, 58);
+  color: #fff;
+  border-bottom: 2px solid #fff;
 }
 
 .playlist-header .collect-playlist {
-  color: rgb(50, 50, 50);
+  color: rgba(255, 255, 255, 0.5);
 }
 .playlist-content {
   padding: 15px 0 0 0;
   margin-bottom: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .playlist-content ul {
   display: grid;
@@ -163,6 +190,7 @@ function formatData(data) {
   white-space: nowrap;
   max-width: 216px;
   text-overflow: ellipsis;
+  color: white;
 
   overflow: hidden;
 }

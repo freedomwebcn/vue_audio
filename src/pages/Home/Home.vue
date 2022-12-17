@@ -1,47 +1,48 @@
 <template>
   <div class="playerUi" :class="{ playing: playStatus }">
-    <i class="zmdi zmdi-arrow-left arrow-left"></i>
-    <template v-if="trackCount">
-      <div class="image"></div>
-      <div class="wave"></div>
-      <div class="wave"></div>
-      <div class="wave"></div>
-      <div class="container">
-        <div class="s-name-box" ref="sNameBoxRef">
-          <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }"></i>
-          <div class="s-name" :class="{ add_animation: animationStatus }">
-            <span class="name text" ref="textRef">{{ nameText }}</span>
-            <span class="name" ref="text2Ref"></span>
-          </div>
-          <i class="r-bg" ref="rBgRef"></i>
-        </div>
+    <!-- <i class="zmdi zmdi-arrow-left arrow-left"></i> -->
 
-        <div class="player__controls">
-          <div class="player__times">
-            <div class="player__time player__time--current">{{ currentTime }}</div>
-            <div class="player__time player__time--duration">{{ duration }}</div>
-          </div>
-          <div class="controls__footer">
-            <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
-            <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
-            <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
-          </div>
+    <div class="image"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="container">
+      <div class="s-name-box" ref="sNameBoxRef">
+        <i class="l-bg" :class="{ 'l-bg-zindex': animationStatus }"></i>
+        <div class="s-name" :class="{ add_animation: animationStatus }">
+          <span class="name text" ref="textRef">{{ nameText }}</span>
+          <span class="name" ref="text2Ref"></span>
         </div>
-        <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
+        <i class="r-bg" ref="rBgRef"></i>
       </div>
-    </template>
+
+      <div class="player__controls">
+        <div class="player__times">
+          <div class="player__time player__time--current">{{ currentTime }}</div>
+          <div class="player__time player__time--duration">{{ duration }}</div>
+        </div>
+        <div class="controls__footer">
+          <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
+          <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
+          <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
+        </div>
+      </div>
+      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onMounted } from 'vue';
+import { nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { throttle } from 'lodash';
-// import { reqUserInfo } from '@/api';
+import { useRoute } from 'vue-router';
 
-async function getUserInfo() {
-  const userInfo = await reqUserInfo();
-  console.log(userInfo);
-}
+import { reqTrackUrl } from '@/api';
+
+const route = useRoute();
+
+console.log(route);
+const { name, id } = route.query;
 
 // getUserInfo();
 const audio = $ref();
@@ -56,38 +57,29 @@ const rBgRef = $ref();
 const animationStatus = $ref(false);
 let index = 0;
 let timerId = null;
-const tracks = $ref([
-  {
-    id: 1,
-    src: 'https://soundbible.com/mp3/airplane-takeoff_daniel_simion.mp3',
-    type: 'audio/mp3',
-    name: 'Airplane Takeoff - Daniel Simion'
-  },
-  {
-    id: 2,
-    src: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/242518/Lecrae_-_Anomaly_(Lyric_Video).mp3',
-    type: 'audio/mp3',
-    name: 'Lecrae - Anomaly'
-  },
-  {
-    id: 3,
-    src: 'https://soundbible.com/mp3/meadowlark_daniel-simion.mp3',
-    type: 'audio/mp3',
-    name: 'Meadowlark - Daniel Simion'
-  }
-]);
-const trackCount = tracks.length;
+const tracks = $ref([]);
+let trackCount;
 
-onMounted(() => {
-  trackCount && loadTrack(index);
-});
+async function getTrackUrl() {
+  const { data } = await reqTrackUrl({ id });
+  tracks.push({ name, src: data[0].url });
+  trackCount = tracks.length;
+
+  loadTrack(index);
+}
+getTrackUrl();
+// onMounted(() => {
+//   trackCount && loadTrack(index);
+// });
 
 function formatTime(s) {
   return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s;
 }
 async function loadTrack(id) {
+  console.log(tracks);
   audio.src = tracks[id].src;
   nameText = tracks[id].name;
+  playAudio();
   await nextTick();
   isAddAnimation(id);
 }
@@ -127,6 +119,8 @@ function getcurrentTime(flag = true) {
   timerId = setTimeout(() => {
     currentTime = formatTime(Math.round(audio.currentTime));
     flag && getcurrentTime();
+
+    console.log(66);
   }, 1000);
 }
 
@@ -153,9 +147,11 @@ function waiting() {
 }
 
 function ended() {
-  setTimeout(() => {
-    nextPlay();
-  }, 1000);
+  // setTimeout(() => {
+  //   nextPlay();
+  // }, 1000);
+  audio.pause();
+
   console.log('play end');
 }
 
@@ -177,7 +173,7 @@ function isAddAnimation(id) {
 .playerUi {
   position: relative;
   display: flex;
-  /* justify-content: center; */
+  justify-content: center;
   width: 300px;
   height: 566px;
   background-color: white;

@@ -6,6 +6,8 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(function (config) {
+  const { cookie } = JSON.parse(window.localStorage.getItem('login_data') || '{}');
+  config.url += `&cookie=${cookie}`;
   return config;
 });
 
@@ -19,7 +21,7 @@ instance.interceptors.response.use(
   },
   function (error) {
     console.log(error);
-    // return Promise.reject(error.message);
+    return Promise.reject(error);
   }
 );
 

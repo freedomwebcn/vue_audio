@@ -1,7 +1,5 @@
 import Home from '@/pages/Home/Home.vue';
 import Login from '@/pages/Login/Login.vue';
-import UserPlaylist from '@/pages/UserPlaylist/UserPlaylist.vue';
-import PlaylistTrack from '@/pages/PlaylistTrack/PlaylistTrack.vue';
 
 const routes = [
   {
@@ -19,16 +17,6 @@ const routes = [
     path: '/Login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/UserPlaylist',
-    name: 'UserPlaylist',
-    component: UserPlaylist
-  },
-  {
-    path: '/PlaylistTrack/:id',
-    name: 'PlaylistTrack',
-    component: PlaylistTrack
   }
 ];
 

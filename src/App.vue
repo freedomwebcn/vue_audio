@@ -1,7 +1,7 @@
 <template>
   <div class="my-app">
     <router-view></router-view>
-    <h1>Audio Card</h1>
+    <h1>Audio Card FM</h1>
   </div>
 </template>
 

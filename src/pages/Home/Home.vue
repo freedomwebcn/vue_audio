@@ -1,8 +1,6 @@
 <template>
   <div class="playerUi" :class="{ playing: playStatus }">
-    <!-- <i class="zmdi zmdi-arrow-left arrow-left"></i> -->
-
-    <div class="image"></div>
+    <div class="image" :style="bgStyleObj"></div>
     <div class="wave"></div>
     <div class="wave"></div>
     <div class="wave"></div>
@@ -22,29 +20,21 @@
           <div class="player__time player__time--duration">{{ duration }}</div>
         </div>
         <div class="controls__footer">
-          <span class="prevBtn button zmdi zmdi-skip-previous" @click="prevPlayThrottled"></span>
+          <span class="prevBtn button iconfont" :class="{ 'icon-love': likeMusicStatus, 'icon-aixin-xian': !likeMusicStatus }" @click="likeMusicDebounced"></span>
           <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
           <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
         </div>
       </div>
-      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing"></audio>
+      <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing" @canplay="canplay"></audio>
     </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { throttle } from 'lodash';
-import { useRoute } from 'vue-router';
+import { nextTick } from 'vue';
+import { throttle, debounce } from 'lodash';
+import { reqPersonalFm, reqTrackUrl, reqLikeMusic } from '@/api';
 
-import { reqTrackUrl } from '@/api';
-
-const route = useRoute();
-
-console.log(route);
-const { name, id } = route.query;
-
-// getUserInfo();
 const audio = $ref();
 const duration = $ref('0:00');
 const currentTime = $ref('0:00');
@@ -58,30 +48,84 @@ const animationStatus = $ref(false);
 let index = 0;
 let timerId = null;
 const tracks = $ref([]);
+const bgStyleObj = $ref({});
 let trackCount;
 
-async function getTrackUrl() {
-  const { data } = await reqTrackUrl({ id });
-  tracks.push({ name, src: data[0].url });
-  trackCount = tracks.length;
+const likeMusicStatus = $ref(false);
 
-  loadTrack(index);
+async function getPersonalFm() {
+  try {
+    const { data, code } = await reqPersonalFm();
+    if (code == 200) {
+      data.forEach((trackObj) => {
+        const { name, duration } = trackObj;
+        const { id } = trackObj.privilege;
+        const { picUrl } = trackObj.album;
+        tracks.push({ name, duration, trackId: id, picUrl });
+      });
+      loadTrack(index);
+    } else {
+      throw data;
+    }
+  } catch (error) {
+    console.log(err, '音频数据请求失败');
+  }
+
+  trackCount = tracks.length;
 }
-getTrackUrl();
-// onMounted(() => {
-//   trackCount && loadTrack(index);
-// });
+getPersonalFm();
 
 function formatTime(s) {
   return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s;
 }
 async function loadTrack(id) {
-  console.log(tracks);
-  audio.src = tracks[id].src;
+  console.log('load...');
+  timerId && clearTimeout(timerId);
+  likeMusicStatus = false;
+  audio.src = '';
+  bgStyleObj = {
+    background: `url(${tracks[id].picUrl}) 75% center / cover no-repeat`
+  };
+  audio.src = await getTrackUrl(tracks[id].trackId);
   nameText = tracks[id].name;
-  playAudio();
   await nextTick();
   isAddAnimation(id);
+}
+
+async function getTrackUrl(id) {
+  try {
+    const { code, data } = await reqTrackUrl({ id });
+    if (code == 200) {
+      return data[0].url;
+    }
+    throw code;
+  } catch (err) {
+    console.log(err, '当前音乐获取播放地址失败');
+    nextPlay();
+  }
+}
+
+const likeMusicDebounced = debounce(likeMusic, 500, {
+  leading: true
+});
+
+async function likeMusic() {
+  likeMusicStatus = !likeMusicStatus;
+  try {
+    const data = await reqLikeMusic({
+      id: tracks[index].trackId,
+      like: likeMusicStatus
+    });
+    const statusMsg = likeMusicStatus ? '喜欢成功' : '取消喜欢成功';
+    if (data.code == 200) {
+      console.log(statusMsg);
+      return;
+    }
+    throw data;
+  } catch (err) {
+    likeMusicStatus = false;
+    console.log('喜欢音乐接口调用失败', err);
+  }
 }
 
 function playAudio() {
@@ -93,34 +137,37 @@ function playAudio() {
   audio.play();
 }
 
-function prevPlay() {
-  currentTime = '0:00';
-  index <= 0 ? (index = trackCount) : index--;
-  loadTrack(index);
-  audio.play();
-}
-const prevPlayThrottled = throttle(prevPlay, 500, {
-  trailing: false
-});
-
 function nextPlay() {
   currentTime = '0:00';
   console.log('next...');
-  index + 1 < trackCount ? index++ : (index = 0);
+  if (index + 1 < trackCount) {
+    index++;
+  } else {
+    console.log('超过了');
+    tracks.length = 0;
+    index = 0;
+    audio.pause();
+    getPersonalFm();
+    return;
+  }
+
   loadTrack(index);
-  audio.play();
 }
 
-const nextPlayThrottled = throttle(nextPlay, 500, {
+function canplay() {
+  console.log(playStatus);
+  playStatus && audio.play();
+}
+
+const nextPlayThrottled = throttle(nextPlay, 800, {
   trailing: false
 });
 
-function getcurrentTime(flag = true) {
+function getcurrentTime() {
   timerId = setTimeout(() => {
+    console.log('currentTime start...');
     currentTime = formatTime(Math.round(audio.currentTime));
-    flag && getcurrentTime();
-
-    console.log(66);
+    getcurrentTime();
   }, 1000);
 }
 
@@ -129,12 +176,12 @@ function loadedMetaData() {
 }
 
 function pause() {
+  currentTime = formatTime(Math.round(audio.currentTime));
   console.log('pause...');
-  getcurrentTime(false);
   clearTimeout(timerId);
 }
 
-function playing() {
+async function playing() {
   playStatus = true;
   getcurrentTime();
   console.log('因缺少数据而暂停或延迟的状态已结束，正准备播放...');
@@ -147,11 +194,9 @@ function waiting() {
 }
 
 function ended() {
-  // setTimeout(() => {
-  //   nextPlay();
-  // }, 1000);
-  audio.pause();
-
+  setTimeout(() => {
+    nextPlay();
+  }, 1000);
   console.log('play end');
 }
 
@@ -182,17 +227,6 @@ function isAddAnimation(id) {
   border-radius: 5px;
   user-select: none;
   box-shadow: 0px 8px 28px -9px rgb(0 0 0 / 45%);
-}
-
-.playerUi .arrow-left {
-  width: 22px;
-  height: 22px;
-  color: rgb(197, 195, 195);
-  z-index: 99999;
-  margin: 10px;
-  line-height: 22px;
-  font-style: normal;
-  font-size: 22px;
 }
 
 .playerUi .wave {
@@ -240,13 +274,14 @@ function isAddAnimation(id) {
 }
 
 .playerUi .image {
-  background: url('http://static1.squarespace.com/static/530b728de4b04fc9b23a5988/t/569880381a5203aa7d44c1a8/1452834873397/00.jpg?format=1000w') no-repeat 75%;
-  background-size: cover;
+  /* background: url('http://static1.squarespace.com/static/530b728de4b04fc9b23a5988/t/569880381a5203aa7d44c1a8/1452834873397/00.jpg?format=1000w') no-repeat 75%; */
+  /* background-size: cover; */
   position: absolute;
   z-index: 1;
   opacity: 0.3;
   height: 300px;
   width: 300px;
+  filter: grayscale(100%);
 }
 
 .playerUi .image::after {
@@ -391,5 +426,16 @@ function isAddAnimation(id) {
 .playBtn {
   margin: 0 80px;
   font-size: 50px;
+}
+
+.prevBtn {
+  font-size: 29px;
+  transition: all 0.15s linear;
+}
+.icon-love {
+  color: #ff564c;
+}
+
+nextBtn {
 }
 </style>

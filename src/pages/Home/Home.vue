@@ -20,9 +20,11 @@
           <div class="player__time player__time--duration">{{ duration }}</div>
         </div>
         <div class="controls__footer">
+          <span class="button iconfont icon-delete" @click="deleteCurrentPlayingFmTrack"></span>
           <span class="prevBtn button iconfont" :class="{ 'icon-love': likeMusicStatus, 'icon-aixin-xian': !likeMusicStatus }" @click="likeMusicDebounced"></span>
           <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
           <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
+          <span class="button iconfont icon-pinglun1"></span>
         </div>
       </div>
       <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing" @canplay="canplay"></audio>
@@ -33,7 +35,7 @@
 <script setup>
 import { nextTick } from 'vue';
 import { throttle, debounce } from 'lodash';
-import { reqPersonalFm, reqTrackUrl, reqLikeMusic } from '@/api';
+import { reqPersonalFm, reqTrackUrl, reqLikeMusic, reqDelFmTrash } from '@/api';
 
 const audio = $ref();
 const duration = $ref('0:00');
@@ -59,16 +61,14 @@ async function getPersonalFm() {
     if (code == 200) {
       data.forEach((trackObj) => {
         const { name, duration } = trackObj;
-        const { id } = trackObj.privilege;
-        const { picUrl } = trackObj.album;
-        tracks.push({ name, duration, trackId: id, picUrl });
+        tracks.push({ name, duration, trackId: trackObj.privilege.id, picUrl: trackObj.album.picUrl });
       });
       loadTrack(index);
     } else {
       throw data;
     }
-  } catch (error) {
-    console.log(err, '音频数据请求失败');
+  } catch (err) {
+    console.log(err, '私人FM数据请求失败');
   }
 
   trackCount = tracks.length;
@@ -79,17 +79,21 @@ function formatTime(s) {
   return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s;
 }
 async function loadTrack(id) {
-  console.log('load...');
-  timerId && clearTimeout(timerId);
-  likeMusicStatus = false;
-  audio.src = '';
-  bgStyleObj = {
-    background: `url(${tracks[id].picUrl}) 75% center / cover no-repeat`
-  };
-  audio.src = await getTrackUrl(tracks[id].trackId);
-  nameText = tracks[id].name;
-  await nextTick();
-  isAddAnimation(id);
+  try {
+    console.log('load...');
+    timerId && clearTimeout(timerId);
+    likeMusicStatus = false;
+    audio.src = '';
+    bgStyleObj = {
+      background: `url(${tracks[id].picUrl}) 75% center / cover no-repeat`
+    };
+    audio.src = await getTrackUrl(tracks[id].trackId);
+    nameText = tracks[id].name;
+    await nextTick();
+    isAddAnimation(id);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function getTrackUrl(id) {
@@ -100,8 +104,9 @@ async function getTrackUrl(id) {
     }
     throw code;
   } catch (err) {
-    console.log(err, '当前音乐获取播放地址失败');
-    nextPlay();
+    alert(err, '当前音乐获取播放地址失败');
+    audio.pause();
+    playStatus = false;
   }
 }
 
@@ -128,6 +133,18 @@ async function likeMusic() {
   }
 }
 
+async function deleteCurrentPlayingFmTrack() {
+  try {
+    const { code } = await reqDelFmTrash({ id: tracks[index].trackId });
+    if (code == 200) {
+      console.log('删除成功');
+      nextPlay();
+    }
+  } catch (error) {
+    console.log('删除FM歌曲失败');
+  }
+}
+
 function playAudio() {
   if (playStatus) {
     audio.pause();
@@ -150,7 +167,6 @@ function nextPlay() {
     getPersonalFm();
     return;
   }
-
   loadTrack(index);
 }
 
@@ -166,8 +182,10 @@ const nextPlayThrottled = throttle(nextPlay, 800, {
 function getcurrentTime() {
   timerId = setTimeout(() => {
     console.log('currentTime start...');
-    currentTime = formatTime(Math.round(audio.currentTime));
-    getcurrentTime();
+    try {
+      currentTime = formatTime(Math.round(audio.currentTime));
+      getcurrentTime();
+    } catch (err) {}
   }, 1000);
 }
 
@@ -176,9 +194,11 @@ function loadedMetaData() {
 }
 
 function pause() {
-  currentTime = formatTime(Math.round(audio.currentTime));
-  console.log('pause...');
-  clearTimeout(timerId);
+  try {
+    currentTime = formatTime(Math.round(audio.currentTime));
+    console.log('pause...');
+    clearTimeout(timerId);
+  } catch (error) {}
 }
 
 async function playing() {
@@ -405,7 +425,7 @@ function isAddAnimation(id) {
 .controls__footer {
   flex: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   position: relative;
   padding: 10px 0 10px 0;
@@ -424,7 +444,6 @@ function isAddAnimation(id) {
 }
 
 .playBtn {
-  margin: 0 80px;
   font-size: 50px;
 }
 
@@ -436,6 +455,12 @@ function isAddAnimation(id) {
   color: #ff564c;
 }
 
+.icon-delete {
+  font-size: 29px;
+}
+.icon-pinglun1 {
+  font-size: 29px;
+}
 nextBtn {
 }
 </style>

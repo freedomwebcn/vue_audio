@@ -10,7 +10,9 @@ export const reqAnonimousLogin = () => ajax('/register/anonimous');
 export const reqPersonalFm = () => ajax(`/personal_fm?timestamp=${Date.now()}`);
 
 // 根据音乐Id获取音乐播放地址
-export const reqTrackUrl = ({ id }) => ajax(`/song/url/v1?id=${id}&level=standard`);
+export const reqTrackUrl = ({ id }) => ajax(`/song/url?id=${id}&br=128000`);
 
 // 喜欢音乐
 export const reqLikeMusic = ({ id, like }) => ajax(`/like?id=${id}&like=${like}&timestamp=${Date.now()}`);
+
+export const reqDelFmTrash = ({ id }) => ajax(`/fm_trash?id=${id}`);

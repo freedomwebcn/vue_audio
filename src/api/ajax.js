@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
+  // baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
+
+  baseURL: 'http://localhost:3000/',
   timeout: 8000
 });
 

@@ -61,35 +61,36 @@ function setStyleObject() {
   };
 }
 
-let time = $ref(60);
+let time = $ref(10);
 let setIntervalId = null;
 let flag = true;
 async function getPhoneCaptcha() {
   if (!verifyePhone()) return;
   if (!flag) return;
-  try {
-    const { code, message } = await reqPhoneCaptcha({ phone });
-    if (code == 200) {
-      getTipMsg({ msg: '验证码发送成功，请及时查看', bgColor: '#07c160' });
-      return;
-    }
-    throw { message };
-  } catch (err) {
-    getTipMsg({ msg: err.message });
-  }
-  setIntervalId && clearInterval(setIntervalId);
+  flag = false;
+  sendCaptchaBtnText = `重新发送验证码(${time})`;
   setIntervalId = setInterval(() => {
     time--;
     if (time < 0) {
       flag = true;
       clearInterval(setIntervalId);
       sendCaptchaBtnText = '发送验证码';
-      time = 60;
+      time = 10;
       return;
     }
-    flag = false;
     sendCaptchaBtnText = `重新发送验证码(${time})`;
   }, 1000);
+
+  try {
+    const { code, message } = await reqPhoneCaptcha({ phone });
+    if (code == 200) {
+      getTipMsg({ msg: '验证码发送成功，请及时查看', bgColor: '#07c160' });
+    } else {
+      throw { message };
+    }
+  } catch (err) {
+    getTipMsg({ msg: err.message });
+  }
 }
 
 function verifyePhone() {

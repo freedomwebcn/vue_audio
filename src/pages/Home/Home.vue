@@ -50,7 +50,6 @@ let timerId = null;
 const tracks = $ref([]);
 const bgStyleObj = $ref({});
 let trackCount;
-
 const likeMusicStatus = $ref();
 
 async function getPersonalFm() {
@@ -148,7 +147,6 @@ function nextPlay() {
     console.log('超过了');
     tracks.length = 0;
     index = 0;
-    // audio.pause();
     getPersonalFm();
     return;
   }
@@ -200,6 +198,7 @@ function waiting() {
 }
 
 function ended() {
+  playStatus = true;
   setTimeout(() => {
     nextPlay();
   }, 1000);

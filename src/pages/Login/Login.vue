@@ -61,10 +61,11 @@ function setStyleObject() {
   };
 }
 
-let time = $ref(10);
+let time = $ref(60);
 let setIntervalId = null;
 let flag = true;
 async function getPhoneCaptcha() {
+  console.log('test');
   if (!verifyePhone()) return;
   if (!flag) return;
   flag = false;
@@ -75,7 +76,7 @@ async function getPhoneCaptcha() {
       flag = true;
       clearInterval(setIntervalId);
       sendCaptchaBtnText = '发送验证码';
-      time = 10;
+      time = 60;
       return;
     }
     sendCaptchaBtnText = `重新发送验证码(${time})`;
@@ -131,7 +132,8 @@ async function phoneLogin() {
     }
     throw data;
   } catch (err_data) {
-    alert('登录失败', err_data);
+    console.log(err_data);
+    alert('登录失败');
   }
 }
 

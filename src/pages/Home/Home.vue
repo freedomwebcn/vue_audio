@@ -51,7 +51,7 @@ const tracks = $ref([]);
 const bgStyleObj = $ref({});
 let trackCount;
 
-const likeMusicStatus = $ref(false);
+const likeMusicStatus = $ref();
 
 async function getPersonalFm() {
   try {
@@ -140,8 +140,10 @@ function playAudio() {
   audio.play();
 }
 
+let nextPlayStstus = false;
 function nextPlay() {
   currentTime = '0:00';
+  nextPlayStstus = true;
   console.log('next...');
   if (index + 1 < trackCount) {
     index++;
@@ -180,6 +182,9 @@ function loadedMetaData() {
 }
 
 function pause() {
+  if (!nextPlayStstus) {
+    playStatus = false;
+  }
   try {
     currentTime = formatTime(Math.round(audio.currentTime));
     console.log('pause...');

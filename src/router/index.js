@@ -5,20 +5,20 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
-router.beforeEach(async (to, from, next) => {
-  const { cookie } = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
+// router.beforeEach(async (to, from, next) => {
+//   const { cookie } = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
 
-  if (cookie) {
-    if (to.name == 'Login') {
-      next({ name: 'Home' });
-    } else {
-      next();
-    }
-  } else if (to.name !== 'Login') {
-    next({ name: 'Login' });
-  } else {
-    next();
-  }
-});
+//   if (cookie) {
+//     if (to.name == 'Login') {
+//       next({ name: 'Home' });
+//     } else {
+//       next();
+//     }
+//   } else if (to.name !== 'Login') {
+//     next({ name: 'Login' });
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

@@ -6,7 +6,7 @@ const router = createRouter({
   routes
 });
 router.beforeEach(async (to, from, next) => {
-  const { cookie } = JSON.parse(window.localStorage.getItem('login_data') || '{}');
+  const { cookie } = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
 
   if (cookie) {
     if (to.name == 'Login') {

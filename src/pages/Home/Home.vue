@@ -20,11 +20,9 @@
           <div class="player__time player__time--duration">{{ duration }}</div>
         </div>
         <div class="controls__footer">
-          <span class="button iconfont icon-delete" @click="deleteCurrentPlayingFmTrack"></span>
-          <span class="prevBtn button iconfont" :class="{ 'icon-love': likeMusicStatus, 'icon-aixin-xian': !likeMusicStatus }" @click="likeMusicDebounced"></span>
+          <span class="likeBtn button iconfont" :class="{ 'icon-love': likeMusicStatus, 'icon-aixin-xian': !likeMusicStatus }" @click="likeMusicDebounced"></span>
           <span class="playBtn button zmdi" @click="playAudio" :class="{ 'zmdi-play-circle': !playStatus, 'zmdi-pause-circle': playStatus }"></span>
           <span class="nextBtn button zmdi zmdi-skip-next" @click="nextPlayThrottled"></span>
-          <span class="button iconfont icon-pinglun1"></span>
         </div>
       </div>
       <audio id="audio" ref="audio" @loadedmetadata="loadedMetaData" @pause="pause" @ended="ended" @waiting="waiting" @playing="playing" @canplay="canplay"></audio>
@@ -35,7 +33,7 @@
 <script setup>
 import { nextTick } from 'vue';
 import { throttle, debounce } from 'lodash';
-import { reqPersonalFm, reqTrackUrl, reqLikeMusic, reqDelFmTrash } from '@/api';
+import { reqPersonalFm, reqTrackUrl, reqLikeMusic } from '@/api';
 
 const audio = $ref();
 const duration = $ref('0:00');
@@ -130,18 +128,6 @@ async function likeMusic() {
   } catch (err) {
     likeMusicStatus = false;
     console.log('喜欢音乐接口调用失败', err);
-  }
-}
-
-async function deleteCurrentPlayingFmTrack() {
-  try {
-    const { code } = await reqDelFmTrash({ id: tracks[index].trackId });
-    if (code == 200) {
-      console.log('删除成功');
-      nextPlay();
-    }
-  } catch (error) {
-    console.log('删除FM歌曲失败');
   }
 }
 
@@ -425,7 +411,7 @@ function isAddAnimation(id) {
 .controls__footer {
   flex: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   position: relative;
   padding: 10px 0 10px 0;
@@ -445,22 +431,14 @@ function isAddAnimation(id) {
 
 .playBtn {
   font-size: 50px;
+  margin: 0 44px;
 }
 
-.prevBtn {
+.likeBtn {
   font-size: 29px;
   transition: all 0.15s linear;
 }
 .icon-love {
   color: #ff564c;
-}
-
-.icon-delete {
-  font-size: 29px;
-}
-.icon-pinglun1 {
-  font-size: 29px;
-}
-nextBtn {
 }
 </style>

@@ -104,7 +104,6 @@ async function getTrackUrl(id) {
   } catch (err) {
     alert(err, '当前音乐获取播放地址失败');
     audio.pause();
-    playStatus = false;
   }
 }
 
@@ -140,10 +139,8 @@ function playAudio() {
   audio.play();
 }
 
-let nextPlayStstus = false;
 function nextPlay() {
   currentTime = '0:00';
-  nextPlayStstus = true;
   console.log('next...');
   if (index + 1 < trackCount) {
     index++;
@@ -151,7 +148,7 @@ function nextPlay() {
     console.log('超过了');
     tracks.length = 0;
     index = 0;
-    audio.pause();
+    // audio.pause();
     getPersonalFm();
     return;
   }
@@ -182,9 +179,7 @@ function loadedMetaData() {
 }
 
 function pause() {
-  if (!nextPlayStstus) {
-    playStatus = false;
-  }
+  playStatus = false;
   try {
     currentTime = formatTime(Math.round(audio.currentTime));
     console.log('pause...');

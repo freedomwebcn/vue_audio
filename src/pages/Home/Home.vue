@@ -101,7 +101,7 @@ async function getTrackUrl(id) {
     }
     throw code;
   } catch (err) {
-    alert(err, '当前音乐获取播放地址失败');
+    console.log(err, '当前音乐获取播放地址失败');
     audio.pause();
   }
 }
@@ -132,7 +132,6 @@ async function likeMusic() {
 function playAudio() {
   if (playStatus) {
     audio.pause();
-    playStatus = false;
     return;
   }
   audio.play();
@@ -208,13 +207,10 @@ function ended() {
 function isAddAnimation(id) {
   animationStatus = false;
   text2Ref.innerHTML = ``;
-  if (textRef.clientWidth > sNameBoxRef.clientWidth) {
-    rBgRef.style.zIndex = 6;
-    text2Ref.innerHTML = tracks[id].name;
-    setTimeout(() => {
-      animationStatus = true;
-    }, 1000);
-  }
+  if (textRef.clientWidth < sNameBoxRef.clientWidth) return;
+  rBgRef.style.zIndex = 6;
+  text2Ref.innerHTML = tracks[id].name;
+  setTimeout(() => (animationStatus = true), 1000);
 }
 </script>
 

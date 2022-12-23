@@ -2,15 +2,32 @@
   <div class="login-page">
     <div class="bg_img" :style="styleObject"></div>
     <Transition>
-      <span class="tip" v-if="loginStatus" :style="{ backgroundColor: tipMsg.bgColor }">{{ tipMsg.text }}</span>
+      <span class="tip" v-if="tipStatus" :style="{ backgroundColor: tipMsg.bgColor }">{{ tipMsg.text }}</span>
     </Transition>
     <div class="login-mode">
       <h2 class="">Hello</h2>
       <div class="login">
         <input type="text" class="phone comm" placeholder="请输入手机号码" v-model="phone" />
         <input type="passworld" class="passworld comm" placeholder="请输入验证码" v-model="captcha" />
-        <button class="btn phone-login" @click="login">登录</button>
-        <button class="btn anonimous_login" @click="getPhoneCaptcha">{{ sendCaptchaBtnText }}</button>
+        <button class="btn phone-login" @click="login">
+          <span v-if="!loadingStatus">登录</span>
+          <div v-else class="va-progress-circle va-progress-circle--indeterminate va-button__loader" style="width: 16px; height: 16px">
+            <svg class="va-progress-circle__wrapper" viewBox="0 0 40 40">
+              <circle
+                class="va-progress-circle__overlay"
+                cx="50%"
+                cy="50%"
+                r="18.5"
+                fill="none"
+                stroke="#FFFFFF"
+                stroke-width="7.5%"
+                stroke-dasharray="116.23892818282235"
+                stroke-dashoffset="116.23892818282235"
+              ></circle>
+            </svg>
+          </div>
+        </button>
+        <button class="btn send_captcha-btn" @click="getPhoneCaptcha">{{ sendCaptchaBtnText }}</button>
       </div>
     </div>
   </div>
@@ -23,14 +40,8 @@ import localStorage from '@/tools/localStorage.js';
 
 const { setItem, getItem } = localStorage();
 const router = useRouter();
-const loginStatus = $ref(false);
-const imgList = [
-  '19e165e754643e1e037ac179c5f183ce.png',
-  'a57082c4353ba26293c5ec3e1301cceb.jpg',
-  'f082e02195053a4265e8c8b3ace48b82.jpg',
-  'bb0eaff8b56676ccfb19eea1bfdf6346.jpg',
-  '2b0a52b3198afd45506d01db2d3dec2e.jpg'
-];
+const tipStatus = $ref(false);
+const imgList = ['19e165e754643e1e037ac179c5f183ce.png', 'a57082c4353ba26293c5ec3e1301cceb.jpg', 'bb0eaff8b56676ccfb19eea1bfdf6346.jpg', '2b0a52b3198afd45506d01db2d3dec2e.jpg'];
 let currentBgUrl = '';
 const styleObject = $ref({});
 let currentBgIndex = parseInt(getItem('index'));
@@ -42,6 +53,7 @@ const tipMsg = $ref({
 });
 let timerId;
 const sendCaptchaBtnText = $ref('发送验证码');
+const loadingStatus = $ref(false);
 
 if (currentBgIndex >= 0) {
   currentBgIndex = currentBgIndex >= imgList.length - 1 ? 0 : ++currentBgIndex;
@@ -111,6 +123,7 @@ async function login() {
     getTipMsg({ msg: '请输入验证码' });
     return;
   }
+  loadingStatus = true;
   try {
     const { code, message } = await reqVerifyePhoneCaptcha({ phone, captcha });
     if (code == 200) {
@@ -119,6 +132,8 @@ async function login() {
     }
     throw { message };
   } catch (err) {
+    loadingStatus = false;
+
     getTipMsg({ msg: err.message });
   }
 }
@@ -139,6 +154,7 @@ async function phoneLogin() {
 
 function loginSuccess(data) {
   setItem(`login_account_data`, data, true);
+  loadingStatus = false;
   getTipMsg({ msg: '登录成功，正在跳转', bgColor: '#07c160' });
   setTimeout(() => {
     router.replace({ path: '/home' });
@@ -146,11 +162,12 @@ function loginSuccess(data) {
 }
 
 function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
+  console.log('test tipmsg');
   tipMsg.text = msg;
   tipMsg.bgColor = bgColor;
-  loginStatus = true;
+  tipStatus = true;
   timerId && clearTimeout(timerId);
-  timerId = setTimeout(() => (loginStatus = false), 3000);
+  timerId = setTimeout(() => (tipStatus = false), 3000);
 }
 </script>
 
@@ -268,11 +285,71 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
 }
 
 .login .phone-login {
+  width: 248px;
+  height: 31px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   margin: 18px 0 0 0;
   background: #3472f0;
 }
 
-.login .anonimous_login {
+.va-button__loader {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.va-progress-circle__wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  transform: rotate(-90deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: va-progress-circle__wrapper--indeterminate 2s linear infinite;
+}
+
+.va-progress-circle__overlay {
+  animation: va-progress-circle__overlay--indeterminate 2s ease-in-out infinite;
+  transition: all ease 2s;
+}
+
+@keyframes va-progress-circle__wrapper--indeterminate {
+  to {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes va-progress-circle__overlay--indeterminate {
+  0% {
+    stroke-dasharray: 1, 125;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 125, 125;
+    stroke-dashoffset: -65px;
+  }
+
+  to {
+    stroke-dasharray: 125, 125;
+    stroke-dashoffset: -125px;
+  }
+}
+
+.login .send_captcha-btn {
   background-color: #969090ab;
 }
 </style>

@@ -133,7 +133,6 @@ async function login() {
     throw { message };
   } catch (err) {
     loadingStatus = false;
-
     getTipMsg({ msg: err.message });
   }
 }
@@ -148,6 +147,7 @@ async function phoneLogin() {
     throw data;
   } catch (err_data) {
     console.log(err_data);
+    loadingStatus = false;
     alert('登录失败');
   }
 }

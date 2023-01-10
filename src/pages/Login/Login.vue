@@ -118,7 +118,7 @@ function verifyePhone() {
 }
 
 async function login() {
-  if (!verifyePhone()) return;
+  if (!verifyePhone() || loadingStatus) return;
   if (verifyePhone() && !captcha) {
     getTipMsg({ msg: '请输入验证码' });
     return;

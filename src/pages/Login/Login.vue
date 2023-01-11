@@ -107,7 +107,7 @@ async function getQRInfoByKey(key) {
     if (code == 200) {
       qrUrl = data.qrimg;
 
-      checkQRStatusByKey(key);
+      // checkQRStatusByKey(key);
     } else {
       throw { code };
     }
@@ -126,8 +126,9 @@ async function checkQRStatusByKey(key) {
       console.log('二维码已过期');
       clearInterval(timerId);
     }
+
+    // 这一步会返回cookie
     if (qrStatus.code === 803) {
-      // 这一步会返回cookie
       clearInterval(timerId);
       loginSuccess(qrStatus.cookie);
     }

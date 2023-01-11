@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  // baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
+  baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
 
-  baseURL: 'http://39.108.111.187:3000/',
+  // baseURL: 'http://39.108.111.187:3000/',
 
   // baseURL: 'http://127.0.0.1:3000/',
 

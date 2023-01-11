@@ -106,8 +106,7 @@ async function getQRInfoByKey(key) {
     const { code, data } = await reqQRInfoByKey({ key });
     if (code == 200) {
       qrUrl = data.qrimg;
-
-      // checkQRStatusByKey(key);
+      checkQRStatusByKey(key);
     } else {
       throw { code };
     }

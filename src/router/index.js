@@ -6,8 +6,8 @@ const router = createRouter({
   routes
 });
 router.beforeEach(async (to, from, next) => {
-  const { cookie } = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
-
+  const cookie = JSON.parse(window.localStorage.getItem('login_account_data'));
+  console.log(cookie);
   if (cookie) {
     if (to.name == 'Login') {
       next({ name: 'Home' });

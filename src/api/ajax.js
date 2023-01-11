@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
+  // baseURL: 'https://netease-bd5k4ejc4-coderwx1.vercel.app',
 
-  // baseURL: 'http://39.108.111.187:3000/',
+  baseURL: 'http://39.108.111.187:3000/',
 
   // baseURL: 'http://127.0.0.1:3000/',
 
@@ -11,7 +11,7 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(function (config) {
-  const { cookie } = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
+  const cookie = JSON.parse(window.localStorage.getItem('login_account_data') || '{}');
   config.url += cookie ? `&cookie=${encodeURIComponent(cookie)}` : '';
   return config;
 });
@@ -20,11 +20,7 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(
   function (response) {
     console.log(response);
-    if (response.data.code == 200) {
-      return response.data;
-    } else if (response.data.code == 400) {
-      return response.data;
-    }
+    return response.data;
   },
   function (error) {
     const { response } = error;

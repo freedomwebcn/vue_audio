@@ -1,5 +1,14 @@
 import ajax from './ajax';
 
+// 二维码登录 返回key值
+export const reqQRKey = () => ajax(`/login/qr/key?timerstamp=${Date.now()}`);
+
+// 根据返回的二维码 key 值 获取二维码base64 和 二维码信息
+export const reqQRInfoByKey = ({ key }) => ajax(`/login/qr/create?key=${key}&qrimg=true&timerstamp=${Date.now()}`);
+
+// 轮询此接口 检测二维码扫码状态
+export const reqCheckQRStatusByKey = ({ key }) => ajax(`/login/qr/check?key=${key}&timerstamp=${Date.now()}`);
+
 // 手机登录
 export const reqPhoneLogin = ({ phone, captcha }) => ajax(`/login/cellphone?phone=${phone}&captcha=${captcha}`);
 

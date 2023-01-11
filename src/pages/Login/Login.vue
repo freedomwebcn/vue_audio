@@ -6,7 +6,8 @@
     </Transition>
     <div class="login-mode">
       <h2 class="">Hello</h2>
-      <div class="login">
+      <!-- 手机登录 -->
+      <!-- <div class="login">
         <input type="text" class="phone comm" placeholder="请输入手机号码" v-model="phone" />
         <input type="passworld" class="passworld comm" placeholder="请输入验证码" v-model="captcha" />
         <button class="btn phone-login" @click="login">
@@ -28,6 +29,16 @@
           </div>
         </button>
         <button class="btn send_captcha-btn" @click="getPhoneCaptcha">{{ sendCaptchaBtnText }}</button>
+      </div> -->
+      <!-- 二维码登录 -->
+      <div class="qr_login">
+        <img :src="qrUrl" alt="" />
+        <p>
+          使用
+          <span>网易云音乐APP</span>
+          扫码登录
+        </p>
+        <!-- <button class="btn" @click="qrLogin">二维码登录</button> -->
       </div>
     </div>
   </div>
@@ -35,7 +46,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reqPhoneLogin, reqPhoneCaptcha, reqVerifyePhoneCaptcha, reqLoginRefresh } from '@/api';
+import { reqQRKey, reqQRInfoByKey, reqCheckQRStatusByKey, reqPhoneLogin, reqPhoneCaptcha, reqVerifyePhoneCaptcha, reqLoginRefresh } from '@/api';
 import localStorage from '@/tools/localStorage.js';
 
 const { setItem, getItem } = localStorage();
@@ -73,9 +84,60 @@ function setStyleObject() {
   };
 }
 
+async function qrLogin() {
+  let key;
+  try {
+    const { code, data } = await reqQRKey();
+    if (code == 200) {
+      key = data.unikey;
+      getQRInfoByKey(key);
+    } else {
+      throw { code };
+    }
+  } catch (err) {
+    console.log(err.code);
+  }
+}
+qrLogin();
+
+let qrUrl = $ref('https://i.postimg.cc/7L5x03LY/02.webp');
+async function getQRInfoByKey(key) {
+  try {
+    const { code, data } = await reqQRInfoByKey({ key });
+    if (code == 200) {
+      qrUrl = data.qrimg;
+
+      checkQRStatusByKey(key);
+    } else {
+      throw { code };
+    }
+  } catch (err) {
+    console.log('获取二维码详情失败', err.code);
+  }
+}
+
+// 轮询接口 检测扫码状态
+async function checkQRStatusByKey(key) {
+  let timerId;
+  timerId = setInterval(async () => {
+    const qrStatus = await reqCheckQRStatusByKey({ key });
+    if (qrStatus.code === 800) {
+      qrLogin(); //二维码过期 重新获取二维码
+      console.log('二维码已过期');
+      clearInterval(timerId);
+    }
+    if (qrStatus.code === 803) {
+      // 这一步会返回cookie
+      clearInterval(timerId);
+      loginSuccess(qrStatus.cookie);
+    }
+  }, 3000);
+}
+
 let time = $ref(60);
 let setIntervalId = null;
 let flag = true;
+
 async function getPhoneCaptcha() {
   console.log('test');
   if (!verifyePhone()) return;
@@ -267,7 +329,7 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
 .login .passworld {
 }
 
-.login .btn {
+.login-mode .btn {
   padding: 7px;
   border: none;
   border-color: transparent;
@@ -279,7 +341,7 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
   font-family: 'Noto Serif SC', serif !important;
   transition: 0.5s;
 }
-.login .btn:active {
+.login-mode .btn:active {
   opacity: 0.75;
   transform: scale(0.75);
 }
@@ -351,5 +413,35 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
 
 .login .send_captcha-btn {
   background-color: #969090ab;
+}
+
+.qr_login {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 48px;
+}
+
+.qr_login .btn {
+  width: 180px;
+  height: 31px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #3472f0;
+}
+.qr_login img {
+  width: 180px;
+  height: 180px;
+  margin-bottom: 25px;
+}
+
+.qr_login p {
+  color: white;
+}
+
+.qr_login p span {
+  color: rgb(248, 50, 50);
 }
 </style>

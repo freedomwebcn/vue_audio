@@ -1,12 +1,12 @@
 <template>
   <div class="login-page">
-    <div class="bg_img" :style="styleObject"></div>
+    <div class="bg_img"></div>
     <Transition>
       <span class="tip" v-if="tipStatus" :style="{ backgroundColor: tipMsg.bgColor }">{{ tipMsg.text }}</span>
     </Transition>
     <div class="login-mode">
       <h2 class="">Hello</h2>
-      <!-- 手机登录 -->
+      <!-- 手机登录------接口不可用 -->
       <!-- <div class="login">
         <input type="text" class="phone comm" placeholder="请输入手机号码" v-model="phone" />
         <input type="passworld" class="passworld comm" placeholder="请输入验证码" v-model="captcha" />
@@ -38,7 +38,6 @@
           <span>网易云音乐APP</span>
           扫码登录
         </p>
-        <!-- <button class="btn" @click="qrLogin">二维码登录</button> -->
       </div>
     </div>
   </div>
@@ -52,10 +51,7 @@ import localStorage from '@/tools/localStorage.js';
 const { setItem, getItem } = localStorage();
 const router = useRouter();
 const tipStatus = $ref(false);
-const imgList = ['19e165e754643e1e037ac179c5f183ce.png', 'a57082c4353ba26293c5ec3e1301cceb.jpg', 'bb0eaff8b56676ccfb19eea1bfdf6346.jpg', '2b0a52b3198afd45506d01db2d3dec2e.jpg'];
-let currentBgUrl = '';
-const styleObject = $ref({});
-let currentBgIndex = parseInt(getItem('index'));
+
 const phone = $ref();
 const captcha = $ref();
 const tipMsg = $ref({
@@ -65,24 +61,6 @@ const tipMsg = $ref({
 let timerId;
 const sendCaptchaBtnText = $ref('发送验证码');
 const loadingStatus = $ref(false);
-
-if (currentBgIndex >= 0) {
-  currentBgIndex = currentBgIndex >= imgList.length - 1 ? 0 : ++currentBgIndex;
-  currentBgUrl = imgList[currentBgIndex];
-  setStyleObject();
-  setItem('index', currentBgIndex);
-} else {
-  currentBgIndex = 0;
-  currentBgUrl = imgList[currentBgIndex];
-  setStyleObject();
-  setItem('index', currentBgIndex);
-}
-
-function setStyleObject() {
-  styleObject = {
-    background: `url(https://pan.whgpc.com/view.php/${currentBgUrl})  center top / cover`
-  };
-}
 
 async function qrLogin() {
   let key;
@@ -106,7 +84,7 @@ async function getQRInfoByKey(key) {
     const { code, data } = await reqQRInfoByKey({ key });
     if (code == 200) {
       qrUrl = data.qrimg;
-      checkQRStatusByKey(key);
+      // checkQRStatusByKey(key);
     } else {
       throw { code };
     }
@@ -274,7 +252,7 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
   position: relative;
   width: 100%;
   height: 100%;
-  /* background: url() top center; */
+  background: url(https://pan.whgpc.com/view.php/2b0a52b3198afd45506d01db2d3dec2e.jpg) center top / cover;
   background-size: cover;
   opacity: 0.8;
 }
@@ -423,14 +401,6 @@ function getTipMsg({ msg, bgColor = 'rgb(238 10 36)' }) {
   padding-top: 48px;
 }
 
-.qr_login .btn {
-  width: 180px;
-  height: 31px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #3472f0;
-}
 .qr_login img {
   width: 180px;
   height: 180px;
